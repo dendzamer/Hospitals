@@ -9,5 +9,7 @@ namespace Hospitals.Areas.Identity.Data
     // Add profile data for application users by adding properties to the CustomUser class
     public class CustomUser : IdentityUser
     {
+        public string Custom_name {get; set;}
+        public bool IsAdmin {get; set;} = false;
     }
 }
