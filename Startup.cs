@@ -36,7 +36,10 @@ namespace Hospitals
             services.AddDefaultIdentity<CustomUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<HospitalsIdentityDbContext>();
             services.AddControllersWithViews();
-
+            services.AddDbContext<HospitalDataContext>(options =>
+                            options.UseSqlite(
+                                Configuration.GetConnectionString("HospitalDataContextConnection")));
+            services.AddDatabaseDeveloperPageExceptionFilter();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
