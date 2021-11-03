@@ -18,6 +18,10 @@ namespace Hospitals.Areas.Identity
                 services.AddDbContext<HospitalsIdentityDbContext>(options =>
                     options.UseSqlite(
                         context.Configuration.GetConnectionString("HospitalsIdentityDbContextConnection")));
+                services.AddDefaultIdentity<CustomUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                                .AddEntityFrameworkStores<HospitalsIdentityDbContext>();
+            services.AddDatabaseDeveloperPageExceptionFilter();
+
             });
         }
     }

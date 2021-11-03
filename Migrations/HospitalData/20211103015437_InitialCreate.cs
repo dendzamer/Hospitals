@@ -36,7 +36,9 @@ namespace Hospitals.Migrations.HospitalData
                     Department = table.Column<string>(type: "TEXT", nullable: true),
                     Salary = table.Column<double>(type: "REAL", nullable: false),
                     Date = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    LinkToText = table.Column<string>(type: "TEXT", nullable: true),
+                    Rating = table.Column<int>(type: "INTEGER", nullable: false),
+                    Speciality = table.Column<string>(type: "TEXT", nullable: true),
+                    ReviewText = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     OwnerId = table.Column<string>(type: "TEXT", nullable: true),
                     HospitalID = table.Column<int>(type: "INTEGER", nullable: false)
                 },
@@ -59,7 +61,7 @@ namespace Hospitals.Migrations.HospitalData
                         .Annotation("Sqlite:Autoincrement", true),
                     UserName = table.Column<string>(type: "TEXT", nullable: true),
                     Date = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    LinkToText = table.Column<string>(type: "TEXT", nullable: true),
+                    CommentText = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     OwnerId = table.Column<string>(type: "TEXT", nullable: true),
                     ReviewID = table.Column<int>(type: "INTEGER", nullable: false)
                 },

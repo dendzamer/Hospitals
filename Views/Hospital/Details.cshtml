@@ -1,10 +1,10 @@
 @model Hospitals.Models.Hospital
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Hospital review";
 }
 
-<h1>Details</h1>
+<h1>Hospital info and reviews</h1>
 
 <div>
     <h4>Hospital</h4>
@@ -54,6 +54,61 @@
         </dd>
     </dl>
 </div>
+<h2>Reviews:</h2>
+<a asp-controller="Review" asp-action="Create" asp-route-HospitalID="@Model.HospitalID">Add review for this hospital</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Username:
+            </th>
+            <th>
+                Department
+            </th>
+            <th>
+                Salary
+            </th>
+            <th>
+                Date
+            </th>
+            <th>
+                Link to text
+            </th>
+            <th>
+                OwnerId
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Reviews) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Department)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Salary)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReviewText)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OwnerId)
+            </td>
+            <td>
+                <a asp-controller="Review" asp-action="Edit" asp-route-id="@item.ReviewID">Edit</a> |
+                <a asp-controller="Review" asp-action="Details" asp-route-id="@item.ReviewID">Read Review</a> |
+                <a asp-controller="Review" asp-action="Delete" asp-route-id="@item.ReviewID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.HospitalID">Edit</a> |
     <a asp-action="Index">Back to List</a>

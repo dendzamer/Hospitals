@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hospitals.Models
 {
@@ -9,7 +11,9 @@ namespace Hospitals.Models
         public string UserName {get; set;}
 
         public DateTime Date {get; set;}
-        public string LinkToText {get; set;}
+
+        [MaxLength(500)]
+        public string CommentText {get; set;}
 
         public string OwnerId {get; set;}
 

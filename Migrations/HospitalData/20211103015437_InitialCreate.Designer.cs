@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hospitals.Migrations.HospitalData
 {
     [DbContext(typeof(HospitalDataContext))]
-    [Migration("20211031224242_InitialCreate")]
+    [Migration("20211103015437_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,10 +24,11 @@ namespace Hospitals.Migrations.HospitalData
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<string>("CommentText")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("LinkToText")
+                    b.Property<DateTime>("Date")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OwnerId")
@@ -93,14 +94,21 @@ namespace Hospitals.Migrations.HospitalData
                     b.Property<int>("HospitalID")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("LinkToText")
+                    b.Property<string>("OwnerId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("OwnerId")
+                    b.Property<int>("Rating")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReviewText")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<double>("Salary")
                         .HasColumnType("REAL");
+
+                    b.Property<string>("Speciality")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserName")
                         .HasColumnType("TEXT");

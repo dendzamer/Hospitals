@@ -1,0 +1,86 @@
+@model IEnumerable<Hospitals.Models.Review>
+
+@{
+    ViewData["Title"] = "All Reviews";
+}
+<h1>Reviews</h1>
+
+<form asp-action="Index" method="get">
+        <div class="form-group">
+            Search by speciality: <input type="text" name="searchString" />
+            <input type="submit" value="Search" class="btn btn-default" />
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="control-label">Filter by department:</label>
+                <select name="filterApplied" class="form-control" asp-items="@ViewBag.filters">
+                    <option value="" selected="selected"></option>
+                </select>
+                
+            </div>
+        </div>
+    </form>
+
+<p>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Department)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Speciality)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Rating)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Salary)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Hospital)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Department)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Speciality)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Rating)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Salary)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Hospital.Name)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ReviewID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ReviewID">Read Review</a> |
+                <a asp-action="Delete" asp-route-id="@item.ReviewID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

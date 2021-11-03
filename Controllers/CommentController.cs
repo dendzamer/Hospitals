@@ -10,46 +10,23 @@ using Hospitals.Models;
 
 namespace Hospitals.Controllers
 {
-    public class HospitalController : Controller
+    public class CommentController : Controller
     {
         private readonly HospitalDataContext _context;
-        private List<string> filteri = new List<string>();
 
-        public HospitalController(HospitalDataContext context)
+        public CommentController(HospitalDataContext context)
         {
             _context = context;
-            foreach (var item in _context.Hospitals)
-            {
-                filteri.Add(item.State);
-            }
         }
 
-        // GET: Hospital
-        public async Task<IActionResult> Index(string searchString, string filterApplied)
+        // GET: Comment
+        public async Task<IActionResult> Index()
         {
-            IEnumerable<Hospital> hospitals = await _context.Hospitals.Include(p => p.Reviews).AsNoTracking().ToListAsync();
-
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                hospitals = hospitals.Where(p => p.Name.ToUpper().Contains(searchString.ToUpper()));
-            }
-
-            if (!String.IsNullOrEmpty(filterApplied))
-            {
-                hospitals = hospitals.Where(p => p.State.ToUpper() == filterApplied.ToUpper());
-            }
-
-            foreach (var item in hospitals)
-            {
-                item.ReviewsCount = item.Reviews.Count();
-            }
-
-
-            ViewBag.filters = new SelectList(filteri);
-            return View(hospitals);
+            var hospitalDataContext = _context.Comments.Include(c => c.Review);
+            return View(await hospitalDataContext.ToListAsync());
         }
 
-        // GET: Hospital/Details/5
+        // GET: Comment/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -57,41 +34,42 @@ namespace Hospitals.Controllers
                 return NotFound();
             }
 
-            var hospital = await _context.Hospitals.Include(p => p.Reviews).AsNoTracking()
-                .FirstOrDefaultAsync(m => m.HospitalID == id);
-            if (hospital == null)
+            var comment = await _context.Comments
+                .Include(c => c.Review)
+                .FirstOrDefaultAsync(m => m.CommentID == id);
+            if (comment == null)
             {
                 return NotFound();
             }
 
-            return View(hospital);
+            return View(comment);
         }
 
-        // GET: Hospital/Create
+        // GET: Comment/Create
         public IActionResult Create()
         {
+            ViewData["ReviewID"] = new SelectList(_context.Reviews, "ReviewID", "ReviewID");
             return View();
         }
 
-        // POST: Hospital/Create
+        // POST: Comment/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("HospitalID,Name,Address,State,Zip")] Hospital hospital)
+        public async Task<IActionResult> Create([Bind("CommentID,UserName,Date,CommentText,OwnerId,ReviewID")] Comment comment)
         {
-
-            //Ovde moram da podesim da ownerId bude jednak Id-u ulogovanog korisnika
             if (ModelState.IsValid)
             {
-                _context.Add(hospital);
+                _context.Add(comment);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(hospital);
+            ViewData["ReviewID"] = new SelectList(_context.Reviews, "ReviewID", "ReviewID", comment.ReviewID);
+            return View(comment);
         }
 
-        // GET: Hospital/Edit/5
+        // GET: Comment/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -99,22 +77,23 @@ namespace Hospitals.Controllers
                 return NotFound();
             }
 
-            var hospital = await _context.Hospitals.FindAsync(id);
-            if (hospital == null)
+            var comment = await _context.Comments.FindAsync(id);
+            if (comment == null)
             {
                 return NotFound();
             }
-            return View(hospital);
+            ViewData["ReviewID"] = new SelectList(_context.Reviews, "ReviewID", "ReviewID", comment.ReviewID);
+            return View(comment);
         }
 
-        // POST: Hospital/Edit/5
+        // POST: Comment/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("HospitalID,Name,Address,State,Zip,Rating,ReviewsCount,OwnerId")] Hospital hospital)
+        public async Task<IActionResult> Edit(int id, [Bind("CommentID,UserName,Date,CommentText,OwnerId,ReviewID")] Comment comment)
         {
-            if (id != hospital.HospitalID)
+            if (id != comment.CommentID)
             {
                 return NotFound();
             }
@@ -123,12 +102,12 @@ namespace Hospitals.Controllers
             {
                 try
                 {
-                    _context.Update(hospital);
+                    _context.Update(comment);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!HospitalExists(hospital.HospitalID))
+                    if (!CommentExists(comment.CommentID))
                     {
                         return NotFound();
                     }
@@ -139,10 +118,11 @@ namespace Hospitals.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(hospital);
+            ViewData["ReviewID"] = new SelectList(_context.Reviews, "ReviewID", "ReviewID", comment.ReviewID);
+            return View(comment);
         }
 
-        // GET: Hospital/Delete/5
+        // GET: Comment/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -150,30 +130,31 @@ namespace Hospitals.Controllers
                 return NotFound();
             }
 
-            var hospital = await _context.Hospitals
-                .FirstOrDefaultAsync(m => m.HospitalID == id);
-            if (hospital == null)
+            var comment = await _context.Comments
+                .Include(c => c.Review)
+                .FirstOrDefaultAsync(m => m.CommentID == id);
+            if (comment == null)
             {
                 return NotFound();
             }
 
-            return View(hospital);
+            return View(comment);
         }
 
-        // POST: Hospital/Delete/5
+        // POST: Comment/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var hospital = await _context.Hospitals.FindAsync(id);
-            _context.Hospitals.Remove(hospital);
+            var comment = await _context.Comments.FindAsync(id);
+            _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool HospitalExists(int id)
+        private bool CommentExists(int id)
         {
-            return _context.Hospitals.Any(e => e.HospitalID == id);
+            return _context.Comments.Any(e => e.CommentID == id);
         }
     }
 }

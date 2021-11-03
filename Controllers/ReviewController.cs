@@ -10,46 +10,43 @@ using Hospitals.Models;
 
 namespace Hospitals.Controllers
 {
-    public class HospitalController : Controller
+    public class ReviewController : Controller
     {
         private readonly HospitalDataContext _context;
         private List<string> filteri = new List<string>();
 
-        public HospitalController(HospitalDataContext context)
+        public ReviewController(HospitalDataContext context)
         {
             _context = context;
-            foreach (var item in _context.Hospitals)
+
+            foreach(var item in _context.Reviews)
             {
-                filteri.Add(item.State);
+                filteri.Add(item.Department);
             }
         }
 
-        // GET: Hospital
+        // GET: Review
         public async Task<IActionResult> Index(string searchString, string filterApplied)
         {
-            IEnumerable<Hospital> hospitals = await _context.Hospitals.Include(p => p.Reviews).AsNoTracking().ToListAsync();
+          IEnumerable<Review> hospitalDataContext = await _context.Reviews.Include(r => r.Hospital).AsNoTracking().ToListAsync();
 
-            if (!String.IsNullOrEmpty(searchString))
+            if (!String.IsNullOrWhiteSpace(searchString))
             {
-                hospitals = hospitals.Where(p => p.Name.ToUpper().Contains(searchString.ToUpper()));
+                hospitalDataContext = hospitalDataContext.Where(p => p.Speciality.ToUpper().Contains(searchString.ToUpper()));
             }
 
-            if (!String.IsNullOrEmpty(filterApplied))
+            if (!String.IsNullOrWhiteSpace(filterApplied))
             {
-                hospitals = hospitals.Where(p => p.State.ToUpper() == filterApplied.ToUpper());
-            }
+                hospitalDataContext = hospitalDataContext.Where(p => p.Department.ToUpper() == filterApplied.ToUpper());
 
-            foreach (var item in hospitals)
-            {
-                item.ReviewsCount = item.Reviews.Count();
             }
-
 
             ViewBag.filters = new SelectList(filteri);
-            return View(hospitals);
+
+            return View(hospitalDataContext);
         }
 
-        // GET: Hospital/Details/5
+        // GET: Review/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -57,41 +54,45 @@ namespace Hospitals.Controllers
                 return NotFound();
             }
 
-            var hospital = await _context.Hospitals.Include(p => p.Reviews).AsNoTracking()
-                .FirstOrDefaultAsync(m => m.HospitalID == id);
-            if (hospital == null)
+            var review = await _context.Reviews
+                .Include(r => r.Hospital).Include(p => p.Comments).AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ReviewID == id);
+            if (review == null)
             {
                 return NotFound();
             }
 
-            return View(hospital);
+            return View(review);
         }
 
-        // GET: Hospital/Create
-        public IActionResult Create()
+        // GET: Review/Create
+        public IActionResult Create(int HospitalID)
         {
+            ViewData["HospitalID"] = HospitalID;
+            ViewData["Proba"] = 1;
+            //ViewData["HospitalID"] = new SelectList(_context.Hospitals, "HospitalID", "HospitalID");
             return View();
         }
 
-        // POST: Hospital/Create
+        // POST: Review/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("HospitalID,Name,Address,State,Zip")] Hospital hospital)
+        public async Task<IActionResult> Create([Bind("ReviewID,UserName,Department,Salary,Speciality,Date,LinkToText,OwnerId,HospitalID,Rating")] Review review)
         {
-
-            //Ovde moram da podesim da ownerId bude jednak Id-u ulogovanog korisnika
             if (ModelState.IsValid)
             {
-                _context.Add(hospital);
+                _context.Add(review);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(hospital);
+            ViewData["HospitalID"] = review.HospitalID;
+            //ViewData["HospitalID"] = new SelectList(_context.Hospitals, "HospitalID", "HospitalID", review.HospitalID);
+            return View(review);
         }
 
-        // GET: Hospital/Edit/5
+        // GET: Review/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -99,22 +100,23 @@ namespace Hospitals.Controllers
                 return NotFound();
             }
 
-            var hospital = await _context.Hospitals.FindAsync(id);
-            if (hospital == null)
+            var review = await _context.Reviews.FindAsync(id);
+            if (review == null)
             {
                 return NotFound();
             }
-            return View(hospital);
+            ViewData["HospitalID"] = new SelectList(_context.Hospitals, "HospitalID", "HospitalID", review.HospitalID);
+            return View(review);
         }
 
-        // POST: Hospital/Edit/5
+        // POST: Review/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("HospitalID,Name,Address,State,Zip,Rating,ReviewsCount,OwnerId")] Hospital hospital)
+        public async Task<IActionResult> Edit(int id, [Bind("ReviewID,UserName,Department,Salary,Date,LinkToText,OwnerId,HospitalID")] Review review)
         {
-            if (id != hospital.HospitalID)
+            if (id != review.ReviewID)
             {
                 return NotFound();
             }
@@ -123,12 +125,12 @@ namespace Hospitals.Controllers
             {
                 try
                 {
-                    _context.Update(hospital);
+                    _context.Update(review);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!HospitalExists(hospital.HospitalID))
+                    if (!ReviewExists(review.ReviewID))
                     {
                         return NotFound();
                     }
@@ -139,10 +141,11 @@ namespace Hospitals.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(hospital);
+            ViewData["HospitalID"] = new SelectList(_context.Hospitals, "HospitalID", "HospitalID", review.HospitalID);
+            return View(review);
         }
 
-        // GET: Hospital/Delete/5
+        // GET: Review/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -150,30 +153,31 @@ namespace Hospitals.Controllers
                 return NotFound();
             }
 
-            var hospital = await _context.Hospitals
-                .FirstOrDefaultAsync(m => m.HospitalID == id);
-            if (hospital == null)
+            var review = await _context.Reviews
+                .Include(r => r.Hospital)
+                .FirstOrDefaultAsync(m => m.ReviewID == id);
+            if (review == null)
             {
                 return NotFound();
             }
 
-            return View(hospital);
+            return View(review);
         }
 
-        // POST: Hospital/Delete/5
+        // POST: Review/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var hospital = await _context.Hospitals.FindAsync(id);
-            _context.Hospitals.Remove(hospital);
+            var review = await _context.Reviews.FindAsync(id);
+            _context.Reviews.Remove(review);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool HospitalExists(int id)
+        private bool ReviewExists(int id)
         {
-            return _context.Hospitals.Any(e => e.HospitalID == id);
+            return _context.Reviews.Any(e => e.ReviewID == id);
         }
     }
 }

@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hospitals.Migrations
 {
     [DbContext(typeof(HospitalsIdentityDbContext))]
-    [Migration("20211031221758_NewMigration")]
-    partial class NewMigration
+    [Migration("20211103014707_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

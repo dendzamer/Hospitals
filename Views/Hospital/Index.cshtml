@@ -1,14 +1,28 @@
 @model IEnumerable<Hospitals.Models.Hospital>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "All Hospitals";
+
 }
 
-<h1>Index</h1>
+<h1>Hospitals</h1>
+<form asp-action="Index" method="get">
+        <div class="form-group">
+            Find by name: <input type="text" name="SearchString" />
+            <input type="submit" value="Search" class="btn btn-default" />
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="control-label">Filter by state:</label>
+                <select name="filterApplied" class="form-control" asp-items="@ViewBag.filters">
+                    <option value="" selected="selected"></option>
+                </select>
+                
+            </div>
+        </div>
+    </form>
+    <a asp-action="Create">Create New Hospital</a>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -62,7 +76,7 @@
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.HospitalID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.HospitalID">Details</a> |
+                <a asp-action="Details" asp-route-id="@item.HospitalID">Details and Reviews</a> |
                 <a asp-action="Delete" asp-route-id="@item.HospitalID">Delete</a>
             </td>
         </tr>

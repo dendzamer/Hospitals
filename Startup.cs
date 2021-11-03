@@ -28,13 +28,6 @@ namespace Hospitals
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<HospitalsIdentityDbContext>(options =>
-                options.UseSqlite(
-                    Configuration.GetConnectionString("HospitalsIdentityDbContextConnection")));
-            services.AddDatabaseDeveloperPageExceptionFilter();
-
-            services.AddDefaultIdentity<CustomUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<HospitalsIdentityDbContext>();
             services.AddControllersWithViews();
             services.AddDbContext<HospitalDataContext>(options =>
                             options.UseSqlite(

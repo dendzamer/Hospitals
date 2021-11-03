@@ -1,0 +1,98 @@
+@model Hospitals.Models.Review
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Hospital review</h1>
+
+<div>
+    <h4>Review details</h4>
+<a asp-action="Edit" asp-route-id="@Model.ReviewID">Edit Review</a>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.UserName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.UserName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Department)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Department)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Salary)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Salary)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Date)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Date)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.ReviewText)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.ReviewText)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.OwnerId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.OwnerId)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Hospital)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Hospital.HospitalID)
+        </dd>
+    </dl>
+</div>
+<h4>Comment section:</h4>
+<a asp-controller="Comment" asp-action="Create" asp-route-id="@Model.ReviewID">Add new comment to this review</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Username:
+            </th>
+            <th>
+                Date
+            </th>
+            <th>
+               OwnerId
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Comments) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OwnerId)
+            </td>
+            <td>
+                <a asp-controller="Comment" asp-action="Edit" asp-route-id="@item.CommentID">Edit</a> |
+                <a asp-controller="Comment" asp-action="Details" asp-route-id="@item.CommentID">Details</a> |
+                <a asp-controller="Comment" asp-action="Delete" asp-route-id="@item.CommentID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<div>
+    <a asp-action="Index">Back to List</a> |
+    <a asp-controller="Hospital" asp-action="Details" asp-route-id="@Model.HospitalID">Back to hospital reviews</a>
+</div>
