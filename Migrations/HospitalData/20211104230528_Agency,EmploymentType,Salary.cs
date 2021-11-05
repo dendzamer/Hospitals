@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Hospitals.Migrations.HospitalData
 {
-    public partial class InitialCreate : Migration
+    public partial class AgencyEmploymentTypeSalary : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -17,6 +17,7 @@ namespace Hospitals.Migrations.HospitalData
                     Address = table.Column<string>(type: "TEXT", nullable: true),
                     State = table.Column<string>(type: "TEXT", nullable: true),
                     Zip = table.Column<int>(type: "INTEGER", nullable: false),
+                    RatingTotal = table.Column<double>(type: "REAL", nullable: false),
                     Rating = table.Column<double>(type: "REAL", nullable: false),
                     ReviewsCount = table.Column<int>(type: "INTEGER", nullable: false),
                     OwnerId = table.Column<string>(type: "TEXT", nullable: true)
@@ -34,10 +35,12 @@ namespace Hospitals.Migrations.HospitalData
                         .Annotation("Sqlite:Autoincrement", true),
                     UserName = table.Column<string>(type: "TEXT", nullable: true),
                     Department = table.Column<string>(type: "TEXT", nullable: true),
-                    Salary = table.Column<double>(type: "REAL", nullable: false),
+                    Salary = table.Column<string>(type: "TEXT", nullable: true),
                     Date = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Rating = table.Column<int>(type: "INTEGER", nullable: false),
                     Speciality = table.Column<string>(type: "TEXT", nullable: true),
+                    Agency = table.Column<string>(type: "TEXT", nullable: true),
+                    EmploymentType = table.Column<string>(type: "TEXT", nullable: true),
                     ReviewText = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     OwnerId = table.Column<string>(type: "TEXT", nullable: true),
                     HospitalID = table.Column<int>(type: "INTEGER", nullable: false)

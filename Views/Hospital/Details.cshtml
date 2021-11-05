@@ -60,10 +60,13 @@
     <thead>
         <tr>
             <th>
-                Username:
+                Username
             </th>
             <th>
                 Department
+            </th>
+            <th>
+                Speciality
             </th>
             <th>
                 Salary
@@ -72,41 +75,39 @@
                 Date
             </th>
             <th>
-                Link to text
-            </th>
-            <th>
-                OwnerId
+                Rating
             </th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Reviews) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.UserName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Department)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Salary)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReviewText)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OwnerId)
-            </td>
-            <td>
-                <a asp-controller="Review" asp-action="Edit" asp-route-id="@item.ReviewID">Edit</a> |
-                <a asp-controller="Review" asp-action="Details" asp-route-id="@item.ReviewID">Read Review</a> |
-                <a asp-controller="Review" asp-action="Delete" asp-route-id="@item.ReviewID">Delete</a>
-            </td>
-        </tr>
-}
+@foreach (var item in Model.Reviews)
+        {
+    <tr>
+    <td>
+        @Html.DisplayFor(modelItem => item.UserName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Department)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Speciality)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Salary)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Date)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Rating)
+    </td>
+    <td>
+        <a asp-controller="Review" asp-action="Edit" asp-route-id="@item.ReviewID">Edit</a> |
+        <a asp-controller="Review" asp-action="Details" asp-route-id="@item.ReviewID">Read Review</a> |
+        <a asp-controller="Review" asp-action="Delete" asp-route-id="@item.ReviewID">Delete</a>
+    </td>
+</tr>
+        }
     </tbody>
 </table>
 <div>

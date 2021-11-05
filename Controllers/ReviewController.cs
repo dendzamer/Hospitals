@@ -7,43 +7,60 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hospitals.Data;
 using Hospitals.Models;
+using CustomClasses;
 
 namespace Hospitals.Controllers
 {
     public class ReviewController : Controller
     {
         private readonly HospitalDataContext _context;
-        private List<string> filteri = new List<string>();
+        private DateTime dateTime = new DateTime();
+
+        private string[] _salaries;
+
+        private int[] _ratings;
+
+        private string[] _departments;
 
         public ReviewController(HospitalDataContext context)
         {
             _context = context;
 
-            foreach(var item in _context.Reviews)
-            {
-                filteri.Add(item.Department);
-            }
+            _salaries = ItemsForLists.GetSalaries();
+            _ratings = ItemsForLists.GetRatings();
+            _departments = ItemsForLists.GetDepartments();
+            dateTime = DateTime.Now;
         }
 
         // GET: Review
-        public async Task<IActionResult> Index(string searchString, string filterApplied)
+        public async Task<IActionResult> Index(string searchString, string filterApplied, int? pageNumber)
         {
-          IEnumerable<Review> hospitalDataContext = await _context.Reviews.Include(r => r.Hospital).AsNoTracking().ToListAsync();
+         // IEnumerable<Review> reviews = await _context.Reviews.Include(r => r.Hospital).AsNoTracking().ToListAsync();
+          var reviews = from s in _context.Reviews.Include(r => r.Hospital) select s;
+
+          if (searchString != null)
+            {
+                pageNumber = 1;
+            }
 
             if (!String.IsNullOrWhiteSpace(searchString))
             {
-                hospitalDataContext = hospitalDataContext.Where(p => p.Speciality.ToUpper().Contains(searchString.ToUpper()));
+                reviews = reviews.Where(p => p.Speciality.ToUpper().Contains(searchString.ToUpper()));
             }
 
             if (!String.IsNullOrWhiteSpace(filterApplied))
             {
-                hospitalDataContext = hospitalDataContext.Where(p => p.Department.ToUpper() == filterApplied.ToUpper());
+                reviews = reviews.Where(p => p.Department.ToUpper() == filterApplied.ToUpper());
 
             }
 
-            ViewBag.filters = new SelectList(filteri);
+            ViewBag.filters = new SelectList(_departments);
 
-            return View(hospitalDataContext);
+            ViewBag.filterApplied = filterApplied;
+
+            int pageSize = 5;
+
+            return View(await PaginatedList<Review>.CreateAsync(reviews, pageNumber ?? 1, pageSize));
         }
 
         // GET: Review/Details/5
@@ -69,7 +86,10 @@ namespace Hospitals.Controllers
         public IActionResult Create(int HospitalID)
         {
             ViewData["HospitalID"] = HospitalID;
-            ViewData["Proba"] = 1;
+            ViewBag.ratings = new SelectList(_ratings);
+
+            ViewBag.departments = new SelectList(_departments);
+            ViewBag.salaries = new SelectList(_salaries);
             //ViewData["HospitalID"] = new SelectList(_context.Hospitals, "HospitalID", "HospitalID");
             return View();
         }
@@ -79,18 +99,27 @@ namespace Hospitals.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReviewID,UserName,Department,Salary,Speciality,Date,LinkToText,OwnerId,HospitalID,Rating")] Review review)
+        public async Task<IActionResult> Create([Bind("ReviewID,UserName,Department,Salary,Speciality,Date,Agency,EmploymentType,ReviewText,OwnerId,HospitalID,Rating")] Review review)
         {
+            review.Date = dateTime;
+
             if (ModelState.IsValid)
             {
                 _context.Add(review);
+
+                Hospital hospital = await _context.Hospitals.FirstAsync(p => p.HospitalID == review.HospitalID);
+                hospital.RatingTotal += review.Rating;
+                hospital.ReviewsCount++;
+                hospital.Rating = Math.Round((double)hospital.RatingTotal / hospital.ReviewsCount, 2);
+
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Hospital", new { id = review.HospitalID});
             }
             ViewData["HospitalID"] = review.HospitalID;
             //ViewData["HospitalID"] = new SelectList(_context.Hospitals, "HospitalID", "HospitalID", review.HospitalID);
             return View(review);
         }
+
 
         // GET: Review/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -99,13 +128,19 @@ namespace Hospitals.Controllers
             {
                 return NotFound();
             }
-
             var review = await _context.Reviews.FindAsync(id);
+
             if (review == null)
             {
                 return NotFound();
             }
-            ViewData["HospitalID"] = new SelectList(_context.Hospitals, "HospitalID", "HospitalID", review.HospitalID);
+
+            ViewData["oldRating"] = review.Rating;
+            ViewData["HospitalID"] = review.HospitalID;
+            ViewBag.ratings = new SelectList(_ratings);
+
+            ViewBag.departments = new SelectList(_departments);
+            ViewBag.salaries = new SelectList(_salaries);
             return View(review);
         }
 
@@ -114,18 +149,19 @@ namespace Hospitals.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ReviewID,UserName,Department,Salary,Date,LinkToText,OwnerId,HospitalID")] Review review)
+        public async Task<IActionResult> Edit([Bind("ReviewID,UserName,Department,Salary,Date,Rating,Speciality,Agency,ReviewText,OwnerId,HospitalID")] Review review, int oldRating)
         {
-            if (id != review.ReviewID)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
                 try
                 {
                     _context.Update(review);
+
+                    var hospital = await _context.Hospitals.FirstAsync(p => p.HospitalID == review.HospitalID);
+                    hospital.RatingTotal -= oldRating;
+                    hospital.RatingTotal += review.Rating;
+                    hospital.Rating = Math.Round((double)hospital.RatingTotal / hospital.ReviewsCount, 2);
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -139,9 +175,14 @@ namespace Hospitals.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Hospital", new { id = review.HospitalID});
             }
-            ViewData["HospitalID"] = new SelectList(_context.Hospitals, "HospitalID", "HospitalID", review.HospitalID);
+
+            ViewBag.ratings = new SelectList(_ratings);
+            ViewBag.departments = new SelectList(_departments);
+            ViewBag.salaries = new SelectList(_salaries);
+            ViewData["HospitalID"] = review.HospitalID;
+
             return View(review);
         }
 
@@ -170,7 +211,15 @@ namespace Hospitals.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var review = await _context.Reviews.FindAsync(id);
+
+            var hospital = await _context.Hospitals.FirstAsync(p => p.HospitalID == review.HospitalID);
+            hospital.RatingTotal -= review.Rating;
+            hospital.ReviewsCount--;
+            hospital.Rating = Math.Round((double)hospital.RatingTotal / hospital.ReviewsCount, 2);
+
+            _context.Update(hospital);
             _context.Reviews.Remove(review);
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

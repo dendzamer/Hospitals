@@ -1,4 +1,4 @@
-@model IEnumerable<Hospitals.Models.Review>
+@model CustomClasses.PaginatedList<Hospitals.Models.Review>
 
 @{
     ViewData["Title"] = "All Reviews";
@@ -13,8 +13,8 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label class="control-label">Filter by department:</label>
-                <select name="filterApplied" class="form-control" asp-items="@ViewBag.filters">
-                    <option value="" selected="selected"></option>
+                <select name="filterApplied" class="form-control" asp-items="@ViewBag.filters" >
+                    <option></option>
                 </select>
                 
             </div>
@@ -27,26 +27,26 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.UserName)
+                UserName
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Department)
+                Department
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Speciality)
+                Speciality
             </th>
 
             <th>
-                @Html.DisplayNameFor(model => model.Rating)
+                Rating
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Salary)
+                Salary
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Date)
+                Date
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Hospital)
+                Hospital
             </th>
             <th></th>
         </tr>
@@ -84,3 +84,20 @@
 }
     </tbody>
 </table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+<a asp-action="Index"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-filterApplied="@ViewBag.filterApplied"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-filterApplied="@ViewBag.filterApplied"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

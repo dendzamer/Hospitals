@@ -1,4 +1,4 @@
-@model IEnumerable<Hospitals.Models.Hospital>
+@model CustomClasses.PaginatedList<Hospitals.Models.Hospital>
 
 @{
     ViewData["Title"] = "All Hospitals";
@@ -15,7 +15,7 @@
             <div class="form-group">
                 <label class="control-label">Filter by state:</label>
                 <select name="filterApplied" class="form-control" asp-items="@ViewBag.filters">
-                    <option value="" selected="selected"></option>
+                    <option value="" selected=""></option>
                 </select>
                 
             </div>
@@ -27,25 +27,22 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Address)
+               Address
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.State)
+                State
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Zip)
+                Zip
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Rating)
+                Rating
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ReviewsCount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OwnerId)
+                ReviewsCount
             </th>
             <th></th>
         </tr>
@@ -72,9 +69,6 @@
                 @Html.DisplayFor(modelItem => item.ReviewsCount)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.OwnerId)
-            </td>
-            <td>
                 <a asp-action="Edit" asp-route-id="@item.HospitalID">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.HospitalID">Details and Reviews</a> |
                 <a asp-action="Delete" asp-route-id="@item.HospitalID">Delete</a>
@@ -83,3 +77,21 @@
 }
     </tbody>
 </table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-filterApplied="@ViewBag.filterApplied"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-filterApplied="@ViewBag.filterApplied"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

@@ -7,27 +7,34 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hospitals.Data;
 using Hospitals.Models;
+using CustomClasses;
 
 namespace Hospitals.Controllers
 {
     public class HospitalController : Controller
     {
         private readonly HospitalDataContext _context;
-        private List<string> filteri = new List<string>();
+        private string[] _states;
+
 
         public HospitalController(HospitalDataContext context)
         {
+            _states = ItemsForLists.GetStates();
             _context = context;
-            foreach (var item in _context.Hospitals)
-            {
-                filteri.Add(item.State);
-            }
+
         }
 
         // GET: Hospital
-        public async Task<IActionResult> Index(string searchString, string filterApplied)
+        public async Task<IActionResult> Index(string searchString, string filterApplied, int? pageNumber)
         {
-            IEnumerable<Hospital> hospitals = await _context.Hospitals.Include(p => p.Reviews).AsNoTracking().ToListAsync();
+            var hospitals = from s in _context.Hospitals.Include(p => p.Reviews) select s;
+        
+           // IEnumerable<Hospital> hospitals = await _context.Hospitals.Include(p => p.Reviews).AsNoTracking().ToListAsync();
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
 
             if (!String.IsNullOrEmpty(searchString))
             {
@@ -39,14 +46,12 @@ namespace Hospitals.Controllers
                 hospitals = hospitals.Where(p => p.State.ToUpper() == filterApplied.ToUpper());
             }
 
-            foreach (var item in hospitals)
-            {
-                item.ReviewsCount = item.Reviews.Count();
-            }
 
+            ViewBag.filterApplied = filterApplied;
+            ViewBag.filters = new SelectList(_states);
 
-            ViewBag.filters = new SelectList(filteri);
-            return View(hospitals);
+            int pageSize = 10;
+             return View(await PaginatedList<Hospital>.CreateAsync(hospitals, pageNumber ?? 1, pageSize));
         }
 
         // GET: Hospital/Details/5
@@ -70,6 +75,7 @@ namespace Hospitals.Controllers
         // GET: Hospital/Create
         public IActionResult Create()
         {
+            ViewBag.states = new SelectList(_states);
             return View();
         }
 
@@ -88,6 +94,8 @@ namespace Hospitals.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.states = new SelectList(_states);
             return View(hospital);
         }
 

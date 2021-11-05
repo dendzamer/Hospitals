@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hospitals.Migrations.HospitalData
 {
     [DbContext(typeof(HospitalDataContext))]
-    [Migration("20211103015437_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20211104230528_Agency,EmploymentType,Salary")]
+    partial class AgencyEmploymentTypeSalary
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -65,6 +65,9 @@ namespace Hospitals.Migrations.HospitalData
                     b.Property<double>("Rating")
                         .HasColumnType("REAL");
 
+                    b.Property<double>("RatingTotal")
+                        .HasColumnType("REAL");
+
                     b.Property<int>("ReviewsCount")
                         .HasColumnType("INTEGER");
 
@@ -85,10 +88,16 @@ namespace Hospitals.Migrations.HospitalData
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Agency")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Department")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EmploymentType")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("HospitalID")
@@ -104,8 +113,8 @@ namespace Hospitals.Migrations.HospitalData
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
-                    b.Property<double>("Salary")
-                        .HasColumnType("REAL");
+                    b.Property<string>("Salary")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Speciality")
                         .HasColumnType("TEXT");

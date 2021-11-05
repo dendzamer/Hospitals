@@ -63,7 +63,7 @@ namespace Hospitals.Controllers
             {
                 _context.Add(comment);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Review", new { id = comment.ReviewID});
             }
             ViewData["ReviewID"] = new SelectList(_context.Reviews, "ReviewID", "ReviewID", comment.ReviewID);
             return View(comment);

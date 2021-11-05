@@ -10,8 +10,8 @@ namespace Hospitals.Models
         public string Address {get; set;}
         public string State {get; set;}
         public int Zip {get; set;}
+        public double RatingTotal {get; set;}
         public double Rating {get; set;}
-
         public int ReviewsCount {get; set;}
 
         public List<Review> Reviews {get;set;}
