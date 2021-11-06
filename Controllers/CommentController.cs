@@ -46,9 +46,9 @@ namespace Hospitals.Controllers
         }
 
         // GET: Comment/Create
-        public IActionResult Create()
+        public IActionResult Create(int ReviewID)
         {
-            ViewData["ReviewID"] = new SelectList(_context.Reviews, "ReviewID", "ReviewID");
+            ViewData["ReviewID"] = ReviewID;
             return View();
         }
 
@@ -65,7 +65,7 @@ namespace Hospitals.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Details", "Review", new { id = comment.ReviewID});
             }
-            ViewData["ReviewID"] = new SelectList(_context.Reviews, "ReviewID", "ReviewID", comment.ReviewID);
+            ViewData["ReviewID"] = comment.ReviewID;
             return View(comment);
         }
 
@@ -82,7 +82,7 @@ namespace Hospitals.Controllers
             {
                 return NotFound();
             }
-            ViewData["ReviewID"] = new SelectList(_context.Reviews, "ReviewID", "ReviewID", comment.ReviewID);
+            ViewData["ReviewID"] = comment.ReviewID;
             return View(comment);
         }
 
@@ -91,7 +91,7 @@ namespace Hospitals.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CommentID,UserName,Date,CommentText,OwnerId,ReviewID")] Comment comment)
+        public async Task<IActionResult> Edit(int id, [Bind("CommentID,UserName,dCommentText,OwnerId,ReviewID")] Comment comment)
         {
             if (id != comment.CommentID)
             {
@@ -102,6 +102,7 @@ namespace Hospitals.Controllers
             {
                 try
                 {
+                    comment.Date = DateTime.Now;
                     _context.Update(comment);
                     await _context.SaveChangesAsync();
                 }
@@ -118,7 +119,7 @@ namespace Hospitals.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ReviewID"] = new SelectList(_context.Reviews, "ReviewID", "ReviewID", comment.ReviewID);
+            ViewData["ReviewID"] = comment.ReviewID;
             return View(comment);
         }
 
@@ -147,9 +148,12 @@ namespace Hospitals.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var comment = await _context.Comments.FindAsync(id);
+
+            var review = await _context.Reviews.FirstAsync(p => p.ReviewID == comment.ReviewID);
+
             _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", "Review", new { id = review.ReviewID });
         }
 
         private bool CommentExists(int id)

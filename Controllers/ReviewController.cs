@@ -102,6 +102,14 @@ namespace Hospitals.Controllers
         public async Task<IActionResult> Create([Bind("ReviewID,UserName,Department,Salary,Speciality,Date,Agency,EmploymentType,ReviewText,OwnerId,HospitalID,Rating")] Review review)
         {
             review.Date = dateTime;
+            if (String.IsNullOrWhiteSpace(review.Speciality))
+            {
+                review.Speciality = "n.a.";
+            }
+            if (String.IsNullOrWhiteSpace(review.Agency))
+            {
+                review.Agency = "n.a.";
+            }
 
             if (ModelState.IsValid)
             {
@@ -149,12 +157,13 @@ namespace Hospitals.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("ReviewID,UserName,Department,Salary,Date,Rating,Speciality,Agency,ReviewText,OwnerId,HospitalID")] Review review, int oldRating)
+        public async Task<IActionResult> Edit([Bind("ReviewID,UserName,Department,Salary,Rating,Speciality,Agency,ReviewText,OwnerId,HospitalID")] Review review, int oldRating)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
+                    review.Date = DateTime.Now;
                     _context.Update(review);
 
                     var hospital = await _context.Hospitals.FirstAsync(p => p.HospitalID == review.HospitalID);
@@ -212,16 +221,25 @@ namespace Hospitals.Controllers
         {
             var review = await _context.Reviews.FindAsync(id);
 
+            _context.Reviews.Remove(review);
+
+
             var hospital = await _context.Hospitals.FirstAsync(p => p.HospitalID == review.HospitalID);
             hospital.RatingTotal -= review.Rating;
             hospital.ReviewsCount--;
-            hospital.Rating = Math.Round((double)hospital.RatingTotal / hospital.ReviewsCount, 2);
+            if (hospital.RatingTotal != 0)
+            {
+                hospital.Rating = Math.Round((double)hospital.RatingTotal / hospital.ReviewsCount, 2);
+            }
 
-            _context.Update(hospital);
-            _context.Reviews.Remove(review);
+            else
+            {
+                hospital.Rating = 0;
+            }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+             return RedirectToAction("Details", "Hospital", new { id = review.HospitalID});
         }
 
         private bool ReviewExists(int id)

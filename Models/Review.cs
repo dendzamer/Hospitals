@@ -8,12 +8,15 @@ namespace Hospitals.Models
     public class Review
     {
         public int ReviewID {get; set;}
+
+        [Required(ErrorMessage = "Please insert your username")]
         public string UserName {get; set;}
 
-       [Required(ErrorMessage = "Please choose a department")]
+        [Required(ErrorMessage = "Please choose a department")]
         public string Department {get; set;}
 
 
+        [Required(ErrorMessage = "Please choose one option")]
         [Display(Name = "Hourly rate")]
         public string Salary {get; set;}
 
@@ -24,7 +27,6 @@ namespace Hospitals.Models
         public string Speciality {get; set;}
 
         public string Agency {get; set;}
-
 
         public string EmploymentType {get; set;}
 

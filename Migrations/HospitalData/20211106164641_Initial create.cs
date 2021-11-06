@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Hospitals.Migrations.HospitalData
 {
-    public partial class AgencyEmploymentTypeSalary : Migration
+    public partial class Initialcreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,8 +13,8 @@ namespace Hospitals.Migrations.HospitalData
                 {
                     HospitalID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    Address = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Address = table.Column<string>(type: "TEXT", nullable: false),
                     State = table.Column<string>(type: "TEXT", nullable: true),
                     Zip = table.Column<int>(type: "INTEGER", nullable: false),
                     RatingTotal = table.Column<double>(type: "REAL", nullable: false),
@@ -33,15 +33,15 @@ namespace Hospitals.Migrations.HospitalData
                 {
                     ReviewID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    UserName = table.Column<string>(type: "TEXT", nullable: true),
-                    Department = table.Column<string>(type: "TEXT", nullable: true),
-                    Salary = table.Column<string>(type: "TEXT", nullable: true),
+                    UserName = table.Column<string>(type: "TEXT", nullable: false),
+                    Department = table.Column<string>(type: "TEXT", nullable: false),
+                    Salary = table.Column<string>(type: "TEXT", nullable: false),
                     Date = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Rating = table.Column<int>(type: "INTEGER", nullable: false),
                     Speciality = table.Column<string>(type: "TEXT", nullable: true),
                     Agency = table.Column<string>(type: "TEXT", nullable: true),
                     EmploymentType = table.Column<string>(type: "TEXT", nullable: true),
-                    ReviewText = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    ReviewText = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
                     OwnerId = table.Column<string>(type: "TEXT", nullable: true),
                     HospitalID = table.Column<int>(type: "INTEGER", nullable: false)
                 },

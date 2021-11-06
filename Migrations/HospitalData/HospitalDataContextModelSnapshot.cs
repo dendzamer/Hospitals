@@ -52,9 +52,11 @@ namespace Hospitals.Migrations.HospitalData
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OwnerId")
@@ -93,6 +95,7 @@ namespace Hospitals.Migrations.HospitalData
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Department")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("EmploymentType")
@@ -108,16 +111,19 @@ namespace Hospitals.Migrations.HospitalData
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ReviewText")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Salary")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Speciality")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("ReviewID");
